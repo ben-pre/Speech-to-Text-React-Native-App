@@ -35,17 +35,22 @@ export const transcribeSpeech = async (
             : Device.isDevice
             ? process.env.LOCAL_DEV_IP || "localhost"
             : "localhost";
-        const serverUrl = `http://${rootOrigin}:4000`;
+        const baseUrl = `http://${rootOrigin}:4000`;
 
-        const response = await fetch(`${serverUrl}/speech-to-text`, {
+        const response = await fetch(`${baseUrl}/speech-to-text`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ audioUrl: base64Audio }),
-        })
-          .then((res) => res.json())
-          .catch((e: Error) => console.error(e));
+        }).catch((e: Error) => {
+          console.error(e);
+          throw new Error("Failed to fetch transcription data");
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
 
         const result: TranscriptionResponse = await response.json();
 

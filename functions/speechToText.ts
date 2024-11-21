@@ -55,8 +55,6 @@ export const speechToText = async (req: Request, res: Response) => {
 
       const transcriptionResult = statusResponse.data;
 
-      console.log("STATUS:::", transcriptionResult.status);
-
       if (transcriptionResult.status === "completed") {
         return transcriptionResult.text;
       } else if (transcriptionResult.status === "failed") {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -8,33 +8,33 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
+import { Audio } from "expo-av";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { recordSpeech } from "@/lib/recordSpeech";
+import { transcribeSpeech } from "@/lib/transcribeSpeech";
 
 export default function HomeScreen() {
   const [transcribedSpeech, setTranscribedSpeech] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const audioRecordingRef = useRef(new Audio.Recording());
 
   const startRecording = async () => {
     setIsRecording(true);
-    // await recordSpeech(
-    //   audioRecordingRef,
-    //   setIsRecording,
-    //   !!webAudioPermissionsRef.current
-    // );
+    await recordSpeech(audioRecordingRef);
   };
 
   const stopRecording = async () => {
     setIsRecording(false);
     setIsTranscribing(true);
-    // try {
-    //   const speechTranscript = await transcribeSpeech(audioRecordingRef);
-    //   setTranscribedSpeech(speechTranscript || "");
-    // } catch (e) {
-    //   console.error(e);
-    // } finally {
-    //   setIsTranscribing(false);
-    // }
+    try {
+      const speechTranscript = await transcribeSpeech(audioRecordingRef);
+      // setTranscribedSpeech(speechTranscript || "");
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsTranscribing(false);
+    }
   };
 
   return (

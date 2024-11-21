@@ -29,7 +29,7 @@ export default function HomeScreen() {
     setIsTranscribing(true);
     try {
       const speechTranscript = await transcribeSpeech(audioRecordingRef);
-      // setTranscribedSpeech(speechTranscript || "");
+      setTranscribedSpeech(speechTranscript || "");
     } catch (e) {
       console.error(e);
     } finally {

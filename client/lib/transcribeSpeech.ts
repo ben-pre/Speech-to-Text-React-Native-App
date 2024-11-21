@@ -4,6 +4,11 @@ import { Audio } from "expo-av";
 import * as Device from "expo-device";
 import * as FileSystem from "expo-file-system";
 
+interface TranscriptionResponse {
+  data?: string;
+  error?: string;
+}
+
 export const transcribeSpeech = async (
   recordingRef: MutableRefObject<Audio.Recording>
 ) => {
@@ -32,7 +37,7 @@ export const transcribeSpeech = async (
             : "localhost";
         const serverUrl = `http://${rootOrigin}:4000`;
 
-        const serverResponse = await fetch(`${serverUrl}/speech-to-text`, {
+        const response = await fetch(`${serverUrl}/speech-to-text`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -42,14 +47,12 @@ export const transcribeSpeech = async (
           .then((res) => res.json())
           .catch((e: Error) => console.error(e));
 
-        console.log("serverResponse", serverResponse);
+        const result: TranscriptionResponse = await response.json();
 
-        const results = serverResponse?.text;
-        if (results) {
-          return results;
+        if (result.data) {
+          return result.data;
         } else {
-          console.error(serverResponse.error);
-          return undefined;
+          throw new Error(result.error || "Transcription failed");
         }
       }
     } else {
